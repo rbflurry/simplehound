@@ -12,14 +12,8 @@ HTTP_OK = 200
 BAD_API_KEY = 401
 
 ## API urls
-URL_DETECTIONS_BASE = "https://{}.sighthoundapi.com/v1/detections"
+URL_DETECTIONS_BASE = "https://{}.sighthoundapi.com/v1/recognition?objectType=vehicle"
 ALLOWED_MODES = ["dev", "prod"]
-
-DETECTIONS_PARAMS = (
-    ("type", "all"),
-    ("faceOption", "gender,age"),
-)
-
 
 def bbox_to_tf_style(bbox: Dict, img_width: int, img_height: int) -> Tuple:
     """
@@ -68,7 +62,7 @@ def get_people(detections: Dict) -> List[Dict]:
     """
     people = []
     for obj in detections["objects"]:
-        if not obj["type"] == "person":
+        if not obj["objectType"] == "vehicle":
             continue
         person = {}
         person["boundingBox"] = obj["boundingBox"]
@@ -94,8 +88,7 @@ def run_detection(
     headers = {"Content-type": "application/json", "X-Access-Token": api_key}
     response = requests.post(
         url_detections,
-        headers=headers,
-        params=DETECTIONS_PARAMS,
+        headers=headers
         data=json.dumps({"image": image_encoded}),
     )
     return response
